@@ -1,6 +1,6 @@
 <?php
 /**
- * The template for displaying archive pages
+ * The template for displaying search results
  *
  * @package BookSaw
  * @since 1.0.0
@@ -15,8 +15,15 @@ get_header();
 
 <div class="container">
     <div style="margin: 2rem 0;">
-        <?php the_archive_title( '<h1>', '</h1>' ); ?>
-        <?php the_archive_description( '<div>', '</div>' ); ?>
+        <h1>
+            <?php
+            printf(
+                esc_html__( 'Search Results for: %s', 'booksawtheme' ),
+                '<span>' . get_search_query() . '</span>'
+            );
+            ?>
+        </h1>
+        <p><?php echo esc_html( $wp_query->found_posts ); ?> <?php esc_html_e( 'results found', 'booksawtheme' ); ?></p>
     </div>
 
     <div style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem;">
@@ -25,7 +32,12 @@ get_header();
             if ( have_posts() ) {
                 while ( have_posts() ) {
                     the_post();
-                    get_template_part( 'template-parts/content' );
+                    
+                    if ( get_post_type() === 'book' ) {
+                        get_template_part( 'template-parts/content-book' );
+                    } else {
+                        get_template_part( 'template-parts/content' );
+                    }
                 }
                 the_posts_pagination();
             } else {

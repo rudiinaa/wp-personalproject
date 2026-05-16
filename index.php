@@ -1,39 +1,43 @@
-<?php get_header(); ?>
+<?php
+/**
+ * The main template file
+ *
+ * @package BookSaw
+ * @since 1.0.0
+ */
 
-<main class="main-content">
-    <?php if ( have_posts() ) : ?>
-        <?php while ( have_posts() ) : the_post(); ?>
-            <article id="post-<?php the_ID(); ?>" <?php post_class( 'entry' ); ?> >
-                <header>
-                    <h2 class="entry-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
-                    <div class="entry-meta">
-                        <span><?php echo esc_html( get_the_date() ); ?></span>
-                        <?php if ( has_post_thumbnail() ) : ?>
-                            <span> | <a href="<?php the_permalink(); ?>">View image</a></span>
-                        <?php endif; ?>
-                    </div>
-                </header>
-                <div class="entry-excerpt">
-                    <?php the_excerpt(); ?>
-                </div>
-            </article>
-        <?php endwhile; ?>
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 
-        <nav class="pagination">
+get_header();
+?>
+
+<div class="container">
+    <div style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem;">
+        <main id="main" class="site-main">
             <?php
-            the_posts_pagination( array(
-                'mid_size' => 1,
-                'prev_text' => __( 'Previous', 'wp-personalproject' ),
-                'next_text' => __( 'Next', 'wp-personalproject' ),
-            ) );
+            if ( have_posts() ) {
+                while ( have_posts() ) {
+                    the_post();
+                    get_template_part( 'template-parts/content' );
+                }
+                the_posts_pagination();
+            } else {
+                get_template_part( 'template-parts/content-none' );
+            }
             ?>
-        </nav>
+        </main><!-- #main -->
 
-    <?php else : ?>
-        <div class="no-posts">
-            <p><?php esc_html_e( 'No journal entries found yet. Start writing your first learning note!', 'wp-personalproject' ); ?></p>
-        </div>
-    <?php endif; ?>
-</main>
+        <aside id="secondary" class="widget-area">
+            <?php
+            if ( is_active_sidebar( 'primary-sidebar' ) ) {
+                dynamic_sidebar( 'primary-sidebar' );
+            }
+            ?>
+        </aside><!-- #secondary -->
+    </div>
+</div>
 
-<?php get_footer(); ?>
+<?php
+get_footer();

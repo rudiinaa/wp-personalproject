@@ -1,31 +1,42 @@
-<?php get_header(); ?>
+<?php
+/**
+ * The template for displaying all single posts
+ *
+ * @package BookSaw
+ * @since 1.0.0
+ */
 
-<main class="main-content">
-    <?php if ( have_posts() ) : ?>
-        <?php while ( have_posts() ) : the_post(); ?>
-            <article id="post-<?php the_ID(); ?>" <?php post_class( 'entry' ); ?> >
-                <header>
-                    <h1 class="entry-title"><?php the_title(); ?></h1>
-                    <div class="entry-meta">
-                        <span><?php echo esc_html( get_the_date() ); ?></span>
-                        <?php if ( has_post_thumbnail() ) : ?>
-                            <div class="entry-thumbnail">
-                                <?php the_post_thumbnail( 'large' ); ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </header>
-                <div class="entry-content">
-                    <?php the_content(); ?>
-                </div>
-                <footer class="entry-meta">
-                    <?php the_tags( '<span>' . esc_html__( 'Tags: ', 'wp-personalproject' ) . '</span>', ', ', '' ); ?>
-                </footer>
-            </article>
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 
-            <?php comments_template(); ?>
-        <?php endwhile; ?>
-    <?php endif; ?>
-</main>
+get_header();
+?>
 
-<?php get_footer(); ?>
+<div class="container">
+    <div style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem;">
+        <main id="main" class="site-main">
+            <?php
+            while ( have_posts() ) {
+                the_post();
+                get_template_part( 'template-parts/content' );
+
+                if ( comments_open() || get_comments_number() ) {
+                    comments_template();
+                }
+            }
+            ?>
+        </main><!-- #main -->
+
+        <aside id="secondary" class="widget-area">
+            <?php
+            if ( is_active_sidebar( 'primary-sidebar' ) ) {
+                dynamic_sidebar( 'primary-sidebar' );
+            }
+            ?>
+        </aside><!-- #secondary -->
+    </div>
+</div>
+
+<?php
+get_footer();
