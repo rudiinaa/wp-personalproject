@@ -13,16 +13,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header();
 ?>
 
+<div class="page-hero">
+    <div class="container">
+        <div class="page-hero-inner">
+            <span class="page-subtitle"><?php esc_html_e( 'Information', 'booksawtheme' ); ?></span>
+            <h1 class="page-title"><?php the_title(); ?></h1>
+            <?php if ( has_excerpt() ) : ?>
+                <p class="page-intro"><?php echo wp_kses_post( get_the_excerpt() ); ?></p>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+
 <div class="container">
-    <div style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem;">
+    <div class="page-layout">
         <main id="main" class="site-main">
             <?php
             while ( have_posts() ) {
                 the_post();
                 ?>
-                <article id="post-<?php the_ID(); ?>" <?php post_class( 'page' ); ?>>
+                <article id="post-<?php the_ID(); ?>" <?php post_class( 'page-content-card' ); ?>>
                     <header class="entry-header">
-                        <h1 class="entry-title"><?php the_title(); ?></h1>
+                        <h1 class="entry-title visually-hidden"><?php the_title(); ?></h1>
                     </header><!-- .entry-header -->
 
                     <div class="entry-content">

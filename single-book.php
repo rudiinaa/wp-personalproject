@@ -21,6 +21,11 @@ $book_publisher = booksaw_get_book_detail( get_the_ID(), 'publisher' );
 $book_year = booksaw_get_book_detail( get_the_ID(), 'year' );
 $book_language = booksaw_get_book_detail( get_the_ID(), 'language' );
 $book_rating = booksaw_get_book_detail( get_the_ID(), 'rating' );
+$book_google_rating = booksaw_get_book_detail( get_the_ID(), 'google-review-rating' );
+$book_review_count = booksaw_get_book_detail( get_the_ID(), 'review-count' );
+$book_google_review_count = booksaw_get_book_detail( get_the_ID(), 'google-review-count' );
+$book_review_excerpt = booksaw_get_book_detail( get_the_ID(), 'review-excerpt' );
+$book_google_review_excerpt = booksaw_get_book_detail( get_the_ID(), 'google-review-excerpt' );
 ?>
 
 <div class="container">
@@ -53,11 +58,45 @@ $book_rating = booksaw_get_book_detail( get_the_ID(), 'rating' );
                 <p style="font-size: 1.1rem; color: #666; margin-bottom: 1rem;"><?php esc_html_e( 'by', 'booksawtheme' ); ?> <strong><?php echo esc_html( $book_author ); ?></strong></p>
             <?php endif; ?>
 
-            <?php if ( $book_rating ) : ?>
-                <div style="margin-bottom: 1.5rem;">
-                    <?php booksaw_display_rating( $book_rating ); ?>
+            <?php
+            $display_rating = $book_google_rating ? floatval( $book_google_rating ) : floatval( $book_rating );
+            $review_count_number = absint( $book_google_review_count ? $book_google_review_count : $book_review_count );
+            $review_excerpt_text = $book_google_review_excerpt ? $book_google_review_excerpt : $book_review_excerpt;
+            $review_source = $book_google_review_count || $book_google_rating ? esc_html__( 'Based on Google results', 'booksawtheme' ) : esc_html__( 'Based on reviews', 'booksawtheme' );
+            ?>
+
+            <div class="book-review-hero">
+                <div class="book-review-hero-top">
+                    <div class="book-review-score">
+                        <?php echo esc_html( $display_rating ? number_format_i18n( $display_rating, 1 ) : '0.0' ); ?>
+                    </div>
+                    <div>
+                        <div class="book-review-stars">
+                            <?php if ( $display_rating ) : ?>
+                                <?php booksaw_display_rating( $display_rating ); ?>
+                            <?php else : ?>
+                                <?php echo '<div class="book-rating"><span class="star empty">★</span><span class="star empty">★</span><span class="star empty">★</span><span class="star empty">★</span><span class="star empty">★</span></div>'; ?>
+                            <?php endif; ?>
+                        </div>
+                        <div class="book-review-count">
+                            <?php echo esc_html( $review_count_number ? sprintf( _n( '%s review', '%s reviews', $review_count_number, 'booksawtheme' ), number_format_i18n( $review_count_number ) ) : esc_html__( 'No reviews yet', 'booksawtheme' ) ); ?>
+                        </div>
+                        <div class="book-review-source">
+                            <?php echo esc_html( $review_source ); ?>
+                        </div>
+                    </div>
                 </div>
-            <?php endif; ?>
+                <div class="book-review-highlight">
+                    <?php if ( $review_excerpt_text ) : ?>
+                        &ldquo;<?php echo esc_html( $review_excerpt_text ); ?>&rdquo;
+                    <?php else : ?>
+                        <?php esc_html_e( 'No review excerpt available yet. Add one in the book settings.', 'booksawtheme' ); ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <?php $book_product_id = get_post_meta( get_the_ID(), '_book_product_id', true );
+            $book_cart_url = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/' ); ?>
 
             <div style="font-size: 1.8rem; margin: 1.5rem 0; color: #8B7355;">
                 <?php if ( $book_price ) : ?>
@@ -70,9 +109,15 @@ $book_rating = booksaw_get_book_detail( get_the_ID(), 'rating' );
                 <?php endif; ?>
             </div>
 
-            <button class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1rem; margin-bottom: 1rem;" onclick="alert('<?php esc_attr_e( 'Add to cart functionality can be enabled with WooCommerce integration', 'booksawtheme' ); ?>')">
-                <?php esc_html_e( 'Add to Cart', 'booksawtheme' ); ?>
-            </button>
+            <?php if ( class_exists( 'WooCommerce' ) && $book_product_id && get_post_type( $book_product_id ) === 'product' ) : ?>
+                <a href="<?php echo esc_url( add_query_arg( 'add-to-cart', absint( $book_product_id ), $book_cart_url ) ); ?>" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1rem; margin-bottom: 1rem;">
+                    <?php esc_html_e( 'Add to Cart', 'booksawtheme' ); ?>
+                </a>
+            <?php else : ?>
+                <button class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1rem; margin-bottom: 1rem; opacity: 0.5; cursor: not-allowed;" disabled>
+                    <?php esc_html_e( 'Add to Cart', 'booksawtheme' ); ?>
+                </button>
+            <?php endif; ?>
 
             <div style="background-color: #F5F3F0; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
                 <h3><?php esc_html_e( 'Book Details', 'booksawtheme' ); ?></h3>
@@ -147,7 +192,14 @@ $book_rating = booksaw_get_book_detail( get_the_ID(), 'rating' );
     <div style="margin: 3rem 0;">
         <h2><?php esc_html_e( 'Book Description', 'booksawtheme' ); ?></h2>
         <div style="line-height: 1.8; color: #666;">
-            <?php the_content(); ?>
+            <?php
+            $book_short_description = booksaw_get_book_short_description( get_the_ID() );
+            if ( $book_short_description ) {
+                echo '<p>' . esc_html( wp_trim_words( $book_short_description, 70, '...' ) ) . '</p>';
+            } else {
+                the_content();
+            }
+            ?>
         </div>
     </div>
 

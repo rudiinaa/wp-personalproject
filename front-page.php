@@ -32,9 +32,10 @@ get_header();
 
         <div class="books-grid">
             <?php
+            $displayed_book_ids = array();
             $featured_books = new WP_Query( array(
                 'post_type'      => 'book',
-                'posts_per_page' => 4,
+                'posts_per_page' => -1,
                 'meta_key'       => '_featured_book',
                 'meta_value'     => '1',
             ) );
@@ -43,6 +44,7 @@ get_header();
                 while ( $featured_books->have_posts() ) {
                     $featured_books->the_post();
                     get_template_part( 'template-parts/content-book' );
+                    $displayed_book_ids[] = get_the_ID();
                 }
             } else {
                 // Show latest books if no featured books
@@ -55,6 +57,7 @@ get_header();
                     while ( $latest_books->have_posts() ) {
                         $latest_books->the_post();
                         get_template_part( 'template-parts/content-book' );
+                        $displayed_book_ids[] = get_the_ID();
                     }
                 }
                 wp_reset_postdata();
@@ -75,9 +78,14 @@ get_header();
             <?php
             $offer_books = new WP_Query( array(
                 'post_type'      => 'book',
-                'posts_per_page' => 4,
-                'meta_key'       => '_book_original_price',
-                'compare'        => 'EXISTS',
+                'posts_per_page' => -1,
+                'meta_query'     => array(
+                    array(
+                        'key'     => '_book_original_price',
+                        'compare' => 'EXISTS',
+                    ),
+                ),
+                'post__not_in'   => $displayed_book_ids,
             ) );
 
             if ( $offer_books->have_posts() ) {

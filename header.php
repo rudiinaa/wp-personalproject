@@ -56,9 +56,15 @@ if ( ! defined( 'ABSPATH' ) ) {
                     </nav>
 
                     <div class="header-icons">
-                        <a href="#" title="<?php esc_attr_e( 'Search', 'booksawtheme' ); ?>" class="header-search-icon">
-                            <span class="dashicon">🔍</span>
-                        </a>
+                        <form role="search" method="get" class="header-search-form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
+                            <label>
+                                <span class="screen-reader-text"><?php esc_html_e( 'Search for:', 'booksawtheme' ); ?></span>
+                                <input type="search" class="search-field" placeholder="<?php esc_attr_e( 'Search...', 'booksawtheme' ); ?>" value="<?php echo get_search_query(); ?>" name="s" />
+                            </label>
+                            <button type="submit" class="search-submit" aria-label="<?php esc_attr_e( 'Search', 'booksawtheme' ); ?>">
+                                <span class="dashicon">🔍</span>
+                            </button>
+                        </form>
                         <?php if ( class_exists( 'WooCommerce' ) ) : ?>
                             <a href="<?php echo esc_url( wc_get_cart_url() ); ?>" title="<?php esc_attr_e( 'Shopping Cart', 'booksawtheme' ); ?>" class="header-cart-icon">
                                 <span class="dashicon">🛒</span>

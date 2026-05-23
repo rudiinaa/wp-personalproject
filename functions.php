@@ -14,6 +14,8 @@ define( 'BOOKSAW_VERSION', '1.0.0' );
 define( 'BOOKSAW_DIR', get_template_directory() );
 define( 'BOOKSAW_URI', get_template_directory_uri() );
 
+require_once BOOKSAW_DIR . '/inc/helpers.php';
+
 /**
  * Set up theme defaults and register support for various WordPress features.
  *
@@ -339,27 +341,50 @@ function booksaw_book_details_callback( $post ) {
     
     $book_author = get_post_meta( $post->ID, '_book_author_name', true );
     $book_isbn = get_post_meta( $post->ID, '_book_isbn', true );
+    $book_short_description = get_post_meta( $post->ID, '_book_short_description', true );
+    $book_product_id = get_post_meta( $post->ID, '_book_product_id', true );
     $book_price = get_post_meta( $post->ID, '_book_price', true );
     $book_original_price = get_post_meta( $post->ID, '_book_original_price', true );
+    $book_featured = get_post_meta( $post->ID, '_featured_book', true );
     $book_pages = get_post_meta( $post->ID, '_book_pages', true );
     $book_publisher = get_post_meta( $post->ID, '_book_publisher', true );
     $book_year = get_post_meta( $post->ID, '_book_year', true );
     $book_language = get_post_meta( $post->ID, '_book_language', true );
     $book_rating = get_post_meta( $post->ID, '_book_rating', true );
+    $book_google_review_rating = get_post_meta( $post->ID, '_book_google_review_rating', true );
+    $book_review_count = get_post_meta( $post->ID, '_book_review_count', true );
+    $book_google_review_count = get_post_meta( $post->ID, '_book_google_review_count', true );
+    $book_review_excerpt = get_post_meta( $post->ID, '_book_review_excerpt', true );
+    $book_google_review_excerpt = get_post_meta( $post->ID, '_book_google_review_excerpt', true );
     ?>
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 1rem;">
         <div>
-            <label for="book_author_name"><?php esc_html_e( 'Author Name:', 'booksawtheme' ); ?></label>
-            <input type="text" id="book_author_name" name="book_author_name" value="<?php echo esc_attr( $book_author ); ?>" style="width:100%; padding: 8px;">
+            <label for="book_google_review_rating"><?php esc_html_e( 'Google Rating (0-5):', 'booksawtheme' ); ?></label>
+            <input type="number" id="book_google_review_rating" name="book_google_review_rating" min="0" max="5" step="0.1" value="<?php echo esc_attr( $book_google_review_rating ); ?>" style="width:100%; padding: 8px;">
         </div>
         <div>
-            <label for="book_isbn"><?php esc_html_e( 'ISBN:', 'booksawtheme' ); ?></label>
-            <input type="text" id="book_isbn" name="book_isbn" value="<?php echo esc_attr( $book_isbn ); ?>" style="width:100%; padding: 8px;">
+            <label for="book_google_review_count"><?php esc_html_e( 'Google Review Count:', 'booksawtheme' ); ?></label>
+            <input type="number" id="book_google_review_count" name="book_google_review_count" min="0" value="<?php echo esc_attr( $book_google_review_count ); ?>" style="width:100%; padding: 8px;">
+        </div>
+    </div>
+    <div style="margin-bottom: 1rem;">
+        <label for="book_google_review_excerpt"><?php esc_html_e( 'Google Review Snippet:', 'booksawtheme' ); ?></label>
+        <input type="text" id="book_google_review_excerpt" name="book_google_review_excerpt" value="<?php echo esc_attr( $book_google_review_excerpt ); ?>" style="width:100%; padding: 8px;" placeholder="<?php esc_attr_e( 'e.g. Excellent book with strong pacing', 'booksawtheme' ); ?>">
+    </div>
+
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 1rem;">
+        <div>
+            <label for="book_product_id"><?php esc_html_e( 'WooCommerce Product ID:', 'booksawtheme' ); ?></label>
+            <input type="number" id="book_product_id" name="book_product_id" value="<?php echo esc_attr( $book_product_id ); ?>" style="width:100%; padding: 8px;" placeholder="<?php esc_attr_e( 'Product ID for cart', 'booksawtheme' ); ?>">
         </div>
         <div>
             <label for="book_price"><?php esc_html_e( 'Price ($):', 'booksawtheme' ); ?></label>
             <input type="number" id="book_price" name="book_price" value="<?php echo esc_attr( $book_price ); ?>" step="0.01" style="width:100%; padding: 8px;">
         </div>
+    </div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 1rem;">
         <div>
             <label for="book_original_price"><?php esc_html_e( 'Original Price ($):', 'booksawtheme' ); ?></label>
             <input type="number" id="book_original_price" name="book_original_price" value="<?php echo esc_attr( $book_original_price ); ?>" step="0.01" style="width:100%; padding: 8px;">
@@ -368,6 +393,8 @@ function booksaw_book_details_callback( $post ) {
             <label for="book_pages"><?php esc_html_e( 'Pages:', 'booksawtheme' ); ?></label>
             <input type="number" id="book_pages" name="book_pages" value="<?php echo esc_attr( $book_pages ); ?>" style="width:100%; padding: 8px;">
         </div>
+    </div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 1rem;">
         <div>
             <label for="book_publisher"><?php esc_html_e( 'Publisher:', 'booksawtheme' ); ?></label>
             <input type="text" id="book_publisher" name="book_publisher" value="<?php echo esc_attr( $book_publisher ); ?>" style="width:100%; padding: 8px;">
@@ -376,6 +403,8 @@ function booksaw_book_details_callback( $post ) {
             <label for="book_year"><?php esc_html_e( 'Publication Year:', 'booksawtheme' ); ?></label>
             <input type="number" id="book_year" name="book_year" value="<?php echo esc_attr( $book_year ); ?>" style="width:100%; padding: 8px;">
         </div>
+    </div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 1rem;">
         <div>
             <label for="book_language"><?php esc_html_e( 'Language:', 'booksawtheme' ); ?></label>
             <input type="text" id="book_language" name="book_language" value="<?php echo esc_attr( $book_language ); ?>" style="width:100%; padding: 8px;">
@@ -384,6 +413,34 @@ function booksaw_book_details_callback( $post ) {
             <label for="book_rating"><?php esc_html_e( 'Rating (0-5):', 'booksawtheme' ); ?></label>
             <input type="number" id="book_rating" name="book_rating" min="0" max="5" step="0.5" value="<?php echo esc_attr( $book_rating ); ?>" style="width:100%; padding: 8px;">
         </div>
+    </div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 1rem;">
+        <div>
+            <label for="book_review_count"><?php esc_html_e( 'Review Count:', 'booksawtheme' ); ?></label>
+            <input type="number" id="book_review_count" name="book_review_count" value="<?php echo esc_attr( $book_review_count ); ?>" min="0" style="width:100%; padding: 8px;">
+        </div>
+        <div>
+            <label for="book_review_excerpt"><?php esc_html_e( 'Review Snippet:', 'booksawtheme' ); ?></label>
+            <input type="text" id="book_review_excerpt" name="book_review_excerpt" value="<?php echo esc_attr( $book_review_excerpt ); ?>" style="width:100%; padding: 8px;" placeholder="<?php esc_attr_e( 'e.g. A must-read!', 'booksawtheme' ); ?>">
+        </div>
+    </div>
+    <div style="margin-bottom: 1rem;">
+        <label for="book_author_name"><?php esc_html_e( 'Author Name:', 'booksawtheme' ); ?></label>
+        <input type="text" id="book_author_name" name="book_author_name" value="<?php echo esc_attr( $book_author ); ?>" style="width:100%; padding: 8px;">
+    </div>
+    <div style="margin-bottom: 1rem;">
+        <label for="book_isbn"><?php esc_html_e( 'ISBN:', 'booksawtheme' ); ?></label>
+        <input type="text" id="book_isbn" name="book_isbn" value="<?php echo esc_attr( $book_isbn ); ?>" style="width:100%; padding: 8px;">
+    </div>
+    <div style="margin-bottom: 1rem;">
+        <label for="book_short_description"><?php esc_html_e( 'Short Description:', 'booksawtheme' ); ?></label>
+        <textarea id="book_short_description" name="book_short_description" rows="4" style="width:100%; padding: 8px;"><?php echo esc_textarea( $book_short_description ); ?></textarea>
+    </div>
+    <div style="display:flex; align-items:center; gap: 1rem; margin-bottom: 1rem;">
+        <label for="book_featured" style="margin:0; font-weight:600; display:inline-flex; align-items:center; gap:0.5rem;">
+            <input type="checkbox" id="book_featured" name="book_featured" value="1" <?php checked( $book_featured, '1' ); ?> />
+            <?php esc_html_e( 'Featured Book', 'booksawtheme' ); ?>
+        </label>
     </div>
     <?php
 }
@@ -409,6 +466,8 @@ function booksaw_save_book_meta( $post_id ) {
     $fields = array(
         'book_author_name' => '_book_author_name',
         'book_isbn' => '_book_isbn',
+        'book_short_description' => '_book_short_description',
+        'book_product_id' => '_book_product_id',
         'book_price' => '_book_price',
         'book_original_price' => '_book_original_price',
         'book_pages' => '_book_pages',
@@ -416,11 +475,34 @@ function booksaw_save_book_meta( $post_id ) {
         'book_year' => '_book_year',
         'book_language' => '_book_language',
         'book_rating' => '_book_rating',
+        'book_google_review_rating' => '_book_google_review_rating',
+        'book_review_count' => '_book_review_count',
+        'book_google_review_count' => '_book_google_review_count',
+        'book_review_excerpt' => '_book_review_excerpt',
+        'book_google_review_excerpt' => '_book_google_review_excerpt',
     );
 
     foreach ( $fields as $post_field => $meta_key ) {
         if ( isset( $_POST[ $post_field ] ) ) {
-            update_post_meta( $post_id, $meta_key, sanitize_text_field( $_POST[ $post_field ] ) );
+            $value = $_POST[ $post_field ];
+            if ( 'book_short_description' === $post_field ) {
+                update_post_meta( $post_id, $meta_key, sanitize_textarea_field( $value ) );
+            } else {
+                update_post_meta( $post_id, $meta_key, sanitize_text_field( $value ) );
+            }
+        }
+    }
+
+    if ( isset( $_POST['book_featured'] ) ) {
+        update_post_meta( $post_id, '_featured_book', '1' );
+    } else {
+        update_post_meta( $post_id, '_featured_book', '0' );
+    }
+
+    if ( ! isset( $_POST['book_short_description'] ) || '' === trim( wp_unslash( $_POST['book_short_description'] ) ) ) {
+        $default_description = booksaw_get_book_short_description( $post_id );
+        if ( $default_description ) {
+            update_post_meta( $post_id, '_book_short_description', sanitize_textarea_field( $default_description ) );
         }
     }
 }
@@ -437,6 +519,19 @@ function booksaw_add_image_sizes() {
     add_image_size( 'book-thumbnail', 150, 200, true );
 }
 add_action( 'after_setup_theme', 'booksaw_add_image_sizes' );
+
+/**
+ * Ensure the book archive displays all books.
+ *
+ * @since 1.0.0
+ * @param WP_Query $query Query instance.
+ */
+function booksaw_show_all_books_in_archive( $query ) {
+    if ( ! is_admin() && $query->is_main_query() && is_post_type_archive( 'book' ) ) {
+        $query->set( 'posts_per_page', -1 );
+    }
+}
+add_action( 'pre_get_posts', 'booksaw_show_all_books_in_archive' );
 
 /**
  * Get book details.

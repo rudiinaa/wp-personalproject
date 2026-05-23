@@ -41,6 +41,81 @@ function booksaw_get_price_info( $post_id ) {
 }
 
 /**
+ * Get a book short description.
+ *
+ * Uses the saved short description if available, otherwise returns a default text for known sample books.
+ *
+ * @since 1.0.0
+ * @param int $post_id Post ID
+ * @return string
+ */
+function booksaw_get_book_short_description( $post_id ) {
+    $description = get_post_meta( $post_id, '_book_short_description', true );
+    if ( $description ) {
+        return $description;
+    }
+
+    $title = strtolower( trim( get_the_title( $post_id ) ) );
+    $title = preg_replace( '/[^a-z0-9]+/', ' ', $title );
+    $title = trim( $title );
+
+    $defaults = array(
+        'atomic habits' => 'A practical guide to building better routines through tiny habit changes that compound over time.',
+        'october sky' => 'The inspiring true story of a young man who pursued rocket science against all odds in a small mining town.',
+        'the king s speech' => 'A moving historical drama about a leader overcoming his stammer with courage and support.',
+        'a beautiful mind' => 'A powerful portrait of genius and resilience, following a mathematician who battles personal challenges while changing the world.',
+        'taxi driver' => 'A gritty portrait of a lonely New York cab driver whose nights behind the wheel spiral into obsession and a desperate search for meaning.',
+        'crime and punishment' => 'A psychological masterpiece that follows a troubled young man as he wrestles with guilt, morality, and the consequences of a dark act.',
+        'gangsta granny' => 'A fun, heartwarming caper about a boy and his secret-agent grandmother who plot a daring museum heist together.',
+        'rich dad poor dad' => 'A bestselling personal finance guide that contrasts two mindsets and reveals the principles of wealth-building through investing and entrepreneurship.',
+        'the story of art' => 'A sweeping visual history of art that traces the great movements, masterpieces, and ideas from antiquity to the modern age.',
+        'shutter island' => 'A tense psychological thriller about a U.S. Marshal investigating a mysterious disappearance on a remote, storm-battered island asylum.',
+    );
+
+    if ( isset( $defaults[ $title ] ) ) {
+        return $defaults[ $title ];
+    }
+
+    $author = get_post_meta( $post_id, '_book_author_name', true );
+    $categories = get_the_terms( $post_id, 'book_category' );
+    $category_name = '';
+
+    if ( ! empty( $categories ) && ! is_wp_error( $categories ) ) {
+        $category_name = $categories[0]->name;
+    }
+
+    if ( $category_name && $author ) {
+        return sprintf(
+            '%s is a %s book by %s that brings its story to life through vivid detail, memorable characters, and clear insight.',
+            $title,
+            strtolower( $category_name ),
+            $author
+        );
+    }
+
+    if ( $category_name ) {
+        return sprintf(
+            '%s is a compelling %s title that combines smart storytelling with unforgettable characters and a strong emotional arc.',
+            $title,
+            strtolower( $category_name )
+        );
+    }
+
+    if ( $author ) {
+        return sprintf(
+            '%s is a compelling read by %s that explores its themes with clarity, heart, and memorable storytelling.',
+            $title,
+            $author
+        );
+    }
+
+    return sprintf(
+        '%s is an engaging new book that delivers fresh ideas, vivid characters, and an immersive reading experience.',
+        $title
+    );
+}
+
+/**
  * Format price for display
  *
  * @since 1.0.0
@@ -142,6 +217,17 @@ function booksaw_get_bestsellers( $limit = 4 ) {
 function booksaw_is_book_on_sale( $post_id ) {
     $price_info = booksaw_get_price_info( $post_id );
     return $price_info['is_discounted'];
+}
+
+/**
+ * Check if a book is marked as featured.
+ *
+ * @since 1.0.0
+ * @param int $post_id Post ID
+ * @return bool True if book is featured
+ */
+function booksaw_is_book_featured( $post_id ) {
+    return '1' === get_post_meta( $post_id, '_featured_book', true );
 }
 
 /**
